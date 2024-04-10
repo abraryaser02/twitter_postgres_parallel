@@ -30,7 +30,7 @@ You will also get practice doing the type of medium sized refactor on code that 
        ```
        with no errors
 
-### The Data
+### The Dataset
 
 In this project, you will be using more data than in the last homework, but still only a small subset of the full twitter dataset.
 The data is located in the `data` folder.
