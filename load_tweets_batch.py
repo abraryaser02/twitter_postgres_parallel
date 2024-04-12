@@ -38,32 +38,6 @@ def remove_nulls(s):
         return s.replace('\x00','\\x00')
 
 
-def get_id_urls(url):
-    '''
-    Given a url, returns the corresponding id in the urls table.
-    If no row exists for the url, then one is inserted automatically.
-    '''
-    sql = sqlalchemy.sql.text('''
-    insert into urls 
-        (url)
-        values
-        (:url)
-    on conflict do nothing
-    returning id_urls
-    ;
-    ''')
-    res = connection.execute(sql,{'url':url}).first()
-    if res is None:
-        sql = sqlalchemy.sql.text('''
-        select id_urls 
-        from urls
-        where
-            url=:url
-        ''')
-        res = connection.execute(sql,{'url':url}).first()
-    id_urls = res[0]
-    return id_urls
-
 
 def batch(iterable, n=1):
     '''
@@ -171,7 +145,7 @@ def insert_tweets(connection, tweets, batch_size=1000):
         input_tweets: a list of dictionaries representing the json tweet objects
     '''
     for i,tweet_batch in enumerate(batch(tweets, batch_size)):
-        print(datetime.datetime.now(),'insert_tweets i=',i)
+        #print(datetime.datetime.now(),'insert_tweets i=',i)
         _insert_tweets(connection, tweet_batch)
 
 
@@ -209,7 +183,7 @@ def _insert_tweets(connection,input_tweets):
         if tweet['user']['url'] is None:
             user_id_urls = None
         else:
-            user_id_urls = get_id_urls(tweet['user']['url'])
+            user_id_urls = tweet['user']['url']
 
         users.append({
             'id_users':tweet['user']['id'],
@@ -322,7 +296,7 @@ def _insert_tweets(connection,input_tweets):
             urls = tweet['entities']['urls']
 
         for url in urls:
-            id_urls = get_id_urls(url['expanded_url'])
+            id_urls = url['expanded_url']
             tweet_urls.append({
                 'id_tweets':tweet['id'],
                 'id_urls':id_urls,
@@ -381,7 +355,7 @@ def _insert_tweets(connection,input_tweets):
                 media = []
 
         for medium in media:
-            id_urls = get_id_urls(medium['media_url'])
+            id_urls = medium['media_url']
             tweet_media.append({
                 'id_tweets':tweet['id'],
                 'id_urls':id_urls,
@@ -448,7 +422,7 @@ if __name__ == '__main__':
     with connection.begin() as trans:
         for filename in sorted(args.inputs, reverse=True):
             with zipfile.ZipFile(filename, 'r') as archive: 
-                print(datetime.datetime.now(),filename)
+               # print(datetime.datetime.now(),filename)
                 for subfilename in sorted(archive.namelist(), reverse=True):
                     with io.TextIOWrapper(archive.open(subfilename)) as f:
                         tweets = []
