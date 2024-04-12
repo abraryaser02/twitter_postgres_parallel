@@ -10,7 +10,7 @@ echo "$files" | time parallel ./load_denormalized.sh
 echo '================================================================================'
 echo 'load pg_normalized'
 echo '================================================================================'
-echo "$files" | time  parallel ./load_normalized.sh
+echo "$files" | time parallel ./load_normalized.sh
 echo '================================================================================'
 echo 'load pg_normalized_batch'
 echo '================================================================================'

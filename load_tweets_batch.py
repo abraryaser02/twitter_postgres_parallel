@@ -145,7 +145,7 @@ def insert_tweets(connection, tweets, batch_size=1000):
         input_tweets: a list of dictionaries representing the json tweet objects
     '''
     for i,tweet_batch in enumerate(batch(tweets, batch_size)):
-        #print(datetime.datetime.now(),'insert_tweets i=',i)
+        print(datetime.datetime.now(),'insert_tweets i=',i)
         _insert_tweets(connection, tweet_batch)
 
 
@@ -192,7 +192,7 @@ def _insert_tweets(connection,input_tweets):
             'screen_name':remove_nulls(tweet['user']['screen_name']),
             'name':remove_nulls(tweet['user']['name']),
             'location':remove_nulls(tweet['user']['location']),
-            'id_urls':user_id_urls,
+            'url':remove_nulls(user_id_urls),
             'description':remove_nulls(tweet['user']['description']),
             'protected':tweet['user']['protected'],
             'verified':tweet['user']['verified'],
@@ -299,7 +299,7 @@ def _insert_tweets(connection,input_tweets):
             id_urls = url['expanded_url']
             tweet_urls.append({
                 'id_tweets':tweet['id'],
-                'id_urls':id_urls,
+                'url':remove_nulls(id_urls)
                 })
 
         ########################################
@@ -358,7 +358,7 @@ def _insert_tweets(connection,input_tweets):
             id_urls = medium['media_url']
             tweet_media.append({
                 'id_tweets':tweet['id'],
-                'id_urls':id_urls,
+                'url':remove_nulls(id_urls),
                 'type':medium['type']
                 })
 
@@ -422,7 +422,7 @@ if __name__ == '__main__':
     with connection.begin() as trans:
         for filename in sorted(args.inputs, reverse=True):
             with zipfile.ZipFile(filename, 'r') as archive: 
-               # print(datetime.datetime.now(),filename)
+                print(datetime.datetime.now(),filename)
                 for subfilename in sorted(archive.namelist(), reverse=True):
                     with io.TextIOWrapper(archive.open(subfilename)) as f:
                         tweets = []
